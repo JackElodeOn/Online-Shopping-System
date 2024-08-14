@@ -35,4 +35,9 @@ public class OnlineShoppingCommodityDaoMySqlImpl implements OnlineShoppingCommod
     public OnlineShoppingCommodity getCommodityDetail(long commodityId) {
         return onlineShoppingCommodityMapper.selectByPrimaryKey(commodityId);
     }
+
+    @Override
+    public int updateCommodity(OnlineShoppingCommodity commodityDetail) {
+        return onlineShoppingCommodityMapper.updateByPrimaryKey(commodityDetail);
+    }
 }

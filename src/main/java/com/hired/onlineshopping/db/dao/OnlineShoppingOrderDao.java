@@ -5,9 +5,9 @@ import com.hired.onlineshopping.db.po.OnlineShoppingOrder;
 public interface OnlineShoppingOrderDao {
     int deleteOrderById(Long orderId);
 
-    int insertOrder(OnlineShoppingOrder record);
+    int insertOrder(OnlineShoppingOrder order);
 
-    OnlineShoppingOrder queryOrderById(Long orderId);
+    OnlineShoppingOrder queryOrderByOrderNo(String orderNo);
 
-    int updateOrder(OnlineShoppingOrder record);
+    int updateOrder(OnlineShoppingOrder order);
 }
