@@ -49,7 +49,7 @@ public class CommodityController {
     @GetMapping({"/commodities", "/"})
     public String listCommodities(Map<String, Object> resultMap) {
         List<OnlineShoppingCommodity> onlineShoppingCommodities = onlineShoppingCommodityDao.listCommodities();
-        resultMap.put("itemlist", onlineShoppingCommodities);
+        resultMap.put("itemList", onlineShoppingCommodities);
         return "list_items";
     }
 

@@ -34,7 +34,7 @@ class HelloWorldControllerTest {
     @Test
     void mockAddPlug2() {
         helloWorldController = new HelloWorldController(fakeDDBRecord);
-        when(fakeDDBRecord.add(anyInt(), anyInt())).thenReturn(10);
+        when(fakeDDBRecord.add(anyInt(), anyInt())).thenReturn(4);
         int result = helloWorldController.addPlug2(1, 3);
         assertEquals(6, result);
     }

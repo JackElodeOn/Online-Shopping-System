@@ -5,6 +5,7 @@ import com.hired.onlineshopping.db.mappers.OnlineShoppingCommodityMapper;
 import com.hired.onlineshopping.db.mappers.OnlineShoppingOrderMapper;
 import com.hired.onlineshopping.db.po.OnlineShoppingCommodity;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,6 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class OnlineShoppingCommodityDaoTest {
     @Resource
     OnlineShoppingCommodityDao dao;
+
+    @AfterAll
+    public static void cleanup() {
+
+    }
 
     @Test
     void insertCommodity() {
