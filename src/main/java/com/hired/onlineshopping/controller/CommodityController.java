@@ -24,7 +24,7 @@ public class CommodityController {
     }
 
     @PostMapping("/commodities")
-    public String createCommodity(@RequestParam("commodityId") long commdityId,
+    public String createCommodity(@RequestParam("commodityId") long commodityId,
                                   @RequestParam("commodityName") String commodityName,
                                   @RequestParam("commodityDesc") String commodityDesc,
                                   @RequestParam("price") int price,
@@ -32,7 +32,7 @@ public class CommodityController {
                                   @RequestParam("creatorUserId") long creatorUserId,
                                   Map<String, Object> resultMap) {
         OnlineShoppingCommodity commodity = OnlineShoppingCommodity.builder()
-                .commodityId(commdityId)
+                .commodityId(commodityId)
                 .commodityName(commodityName)
                 .commodityDesc(commodityDesc)
                 .price(price)
@@ -68,5 +68,13 @@ public class CommodityController {
         OnlineShoppingCommodity commodity = onlineShoppingCommodityDao.getCommodityDetail(Long.parseLong(commodityId));
         resultMap.put("commodity", commodity);
         return "item_detail";
+    }
+
+    @PostMapping("updateCommodities/{commodityId}")
+    public String updateCommodity(@PathVariable("commodityId") String commodityId,
+                                  Map<String, Object> resultMap){
+        OnlineShoppingCommodity onlineShoppingCommodity = onlineShoppingCommodityDao.getCommodityDetail(Long.valueOf(commodityId));
+        resultMap.put("commodity", onlineShoppingCommodity);
+        return "update_commodity";
     }
 }
