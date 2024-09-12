@@ -1,10 +1,14 @@
 package com.hired.onlineshopping.service;
 
+import com.alibaba.fastjson.JSON;
 import com.hired.onlineshopping.db.dao.OnlineShoppingCommodityDao;
 import com.hired.onlineshopping.db.dao.OnlineShoppingOrderDao;
+import com.hired.onlineshopping.db.mappers.OnlineShoppingOrderMapper;
 import com.hired.onlineshopping.db.po.OnlineShoppingCommodity;
 import com.hired.onlineshopping.db.po.OnlineShoppingOrder;
+import com.hired.onlineshopping.service.mq.RocketMQService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,6 +27,12 @@ public class OrderService {
 
     @Resource
     RedisService redisService;
+
+    @Resource
+    RocketMQService rocketMQService;
+
+    @Autowired
+    private OnlineShoppingOrderMapper onlineShoppingOrderMapper;
 
     public OnlineShoppingOrder placeOrderOriginal(String commodityId, String userId) {
         OnlineShoppingCommodity commodityDetail = commodityDao.getCommodityDetail(Long.parseLong(commodityId));
@@ -58,7 +68,7 @@ public class OrderService {
     }
 
     public OnlineShoppingOrder placeOrderWithRedis(String commodityId, String userId) {
-        String redisKey = "commodityId" +  commodityId;
+        String redisKey = "commodity:" +  commodityId;
         long deductedStock = redisService.stockDeduct(redisKey);
         if (deductedStock >= 0) {
             // TODO: improve write operation deduct with MYSQL to
@@ -112,5 +122,29 @@ public class OrderService {
         // update commodity lockstock in mysql
         OnlineShoppingCommodity commodityDetail = commodityDao.getCommodityDetail(order.getCommodityId());
         commodityDetail.setLockStock(commodityDetail.getLockStock() - 1);
+        commodityDao.updateCommodity(commodityDetail);
+    }
+
+    public OnlineShoppingOrder placeOrderFinal(String commodityId, String userId) {
+        String redisKey = "commodity:" +  commodityId;
+        long deductedStock = redisService.stockDeduct(redisKey);
+        if (deductedStock >= 0) {
+            OnlineShoppingOrder order = OnlineShoppingOrder.builder()
+                    .orderNo(UUID.randomUUID().toString())
+                    .commodityId(Long.parseLong(commodityId))
+                    .userId(Long.parseLong(userId))
+                    .build();
+            try {
+                rocketMQService.sendMessage("createOrder", JSON.toJSONString(order));
+                redisService.addToDenyList(userId, commodityId);
+                return order;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            log.info("Process order with Redis shows commodity out of stock");
+            return null;
+        }
     }
 }

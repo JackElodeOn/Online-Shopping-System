@@ -1,5 +1,6 @@
 package com.hired.onlineshopping.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -8,6 +9,7 @@ import javax.annotation.Resource;
 import java.util.Collections;
 
 @Service
+@Slf4j
 public class RedisService {
     @Resource
     private JedisPool jedisPool;
@@ -76,5 +78,39 @@ public class RedisService {
             System.out.println("Exception on stockDeductValidation：" + throwable.toString());
             return -1;
         }
+    }
+
+    public void revertStock(String redisKey) {
+        Jedis client = jedisPool.getResource();
+        client.incr(redisKey);
+        client.close();
+    }
+
+    public void addToDenyList(String userId, String commodityId) {
+        Jedis jedisClient = jedisPool.getResource();
+        // key: denyList: 123
+        // values: set of {1,2}
+        jedisClient.sadd("denyList:" + userId,
+                String.valueOf(commodityId));
+        jedisClient.close();
+        log.info("Add userId: {} into denyList for commodityId: {}", userId, commodityId);
+    }
+
+    public void removeFromDenyList(String userId, String commodityId) {
+        Jedis jedisClient = jedisPool.getResource();
+        jedisClient.srem("denyList:" + userId,
+                String.valueOf(commodityId));
+        jedisClient.close();
+        log.info("Remove userId: {} into denyList for commodityId: {}", userId, commodityId);
+    }
+
+    public boolean isInDenyList(String userId, String commodityId) {
+        Jedis jedisClient = jedisPool.getResource();
+        Boolean isInDenyList = jedisClient.sismember("denyList:" + userId,
+                String.valueOf(commodityId));
+        jedisClient.close();
+        log.info("userId: {} , commodityId {} is InDenyList result: {}", userId, commodityId,
+                isInDenyList);
+        return isInDenyList;
     }
 }

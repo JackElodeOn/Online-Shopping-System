@@ -45,4 +45,9 @@ public class OnlineShoppingCommodityDaoMySqlImpl implements OnlineShoppingCommod
     public int deductStockWithCommodityId(long commodityId) {
         return onlineShoppingCommodityMapper.deductStockWithCommodityId(commodityId);
     }
+
+    @Override
+    public int revertStockWithCommodityId(long commodityId) {
+        return onlineShoppingCommodityMapper.revertStockWithCommodityId(commodityId);
+    }
 }

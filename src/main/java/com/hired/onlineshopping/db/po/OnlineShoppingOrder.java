@@ -1,5 +1,6 @@
 package com.hired.onlineshopping.db.po;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.util.Date;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class OnlineShoppingOrder {
     private Long orderId;
 

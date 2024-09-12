@@ -5,6 +5,7 @@ import com.hired.onlineshopping.db.dao.OnlineShoppingOrderDao;
 import com.hired.onlineshopping.db.po.OnlineShoppingCommodity;
 import com.hired.onlineshopping.db.po.OnlineShoppingOrder;
 import com.hired.onlineshopping.service.OrderService;
+import com.hired.onlineshopping.service.RedisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,19 +25,28 @@ public class OrderController {
     @Resource
     OnlineShoppingCommodityDao commodityDao;
 
+    @Resource
+    RedisService redisService;
+
     @GetMapping("commodity/buy/{userId}/{commodityId}")
     public String buyCommodity(@PathVariable("userId") String userId,
                                @PathVariable("commodityId") String commodityId,
                                Map<String, Object> resultMap) {
+        if (redisService.isInDenyList(userId, commodityId)) {
+            resultMap.put("resultInfo", "each user have only one quote for this commodity");
+            resultMap.put("orderNo", "000");
+            return "order_result";
+        }
         //OnlineShoppingOrder order = orderService.placeOrderOriginal(commodityId, userId);
         //OnlineShoppingOrder order = orderService.placeOrderOneSQL(commodityId, userId);
         //OnlineShoppingOrder order = orderService.placeOrderWithRedis(commodityId, userId);
-        OnlineShoppingOrder order = orderService.placeOrderWithDistributedLock(commodityId, userId);
+        //OnlineShoppingOrder order = orderService.placeOrderWithDistributedLock(commodityId, userId);
+        OnlineShoppingOrder order = orderService.placeOrderFinal(commodityId, userId);
         if (order != null) {
             resultMap.put("resultInfo", "Create Order successfully! OrderNum:" + order.getOrderNo());
             resultMap.put("orderNo", order.getOrderNo());
         } else {
-            resultMap.put("resultInfo", "Out of Stock");
+            resultMap.put("resultInfo", "Fail to create order, check log for detail!");
             resultMap.put("orderNo", "");
         }
         return "order_result";

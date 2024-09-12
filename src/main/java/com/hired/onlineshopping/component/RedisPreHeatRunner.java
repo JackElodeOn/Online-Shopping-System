@@ -23,7 +23,7 @@ public class RedisPreHeatRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         List<OnlineShoppingCommodity> onlineShoppingCommodities = commodityDao.listCommodities();
         for ( OnlineShoppingCommodity commodity: onlineShoppingCommodities) {
-            String redisKey = "commodityId" +  commodity.getCommodityId();
+            String redisKey = "commodity:" +  commodity.getCommodityId();
             redisService.setValue(redisKey, commodity.getAvailableStock().toString());
             log.info("preHeat Staring: Initialize commodity :" + commodity.getCommodityId());
         }
