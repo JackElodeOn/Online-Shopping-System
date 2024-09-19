@@ -50,4 +50,10 @@ public class OnlineShoppingCommodityDaoMySqlImpl implements OnlineShoppingCommod
     public int revertStockWithCommodityId(long commodityId) {
         return onlineShoppingCommodityMapper.revertStockWithCommodityId(commodityId);
     }
+
+    @Override
+    public List<OnlineShoppingCommodity> searchCommodityByKeyWord(String keyWord) {
+        String keyWordPattern = "%" + keyWord + "%";
+        return onlineShoppingCommodityMapper.searchCommodityByKeyWord(keyWordPattern);
+    }
 }

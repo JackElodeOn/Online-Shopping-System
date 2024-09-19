@@ -2,6 +2,7 @@ package com.hired.onlineshopping.component;
 
 import com.hired.onlineshopping.db.dao.OnlineShoppingCommodityDao;
 import com.hired.onlineshopping.db.po.OnlineShoppingCommodity;
+import com.hired.onlineshopping.service.EsService;
 import com.hired.onlineshopping.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -19,12 +20,17 @@ public class RedisPreHeatRunner implements ApplicationRunner {
 
     @Resource
     RedisService redisService;
+
+    @Resource
+    EsService esService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         List<OnlineShoppingCommodity> onlineShoppingCommodities = commodityDao.listCommodities();
         for ( OnlineShoppingCommodity commodity: onlineShoppingCommodities) {
             String redisKey = "commodity:" +  commodity.getCommodityId();
             redisService.setValue(redisKey, commodity.getAvailableStock().toString());
+            esService.addCommodityToEs(commodity);
             log.info("preHeat Staring: Initialize commodity :" + commodity.getCommodityId());
         }
     }

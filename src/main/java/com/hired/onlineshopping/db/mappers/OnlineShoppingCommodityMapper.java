@@ -24,4 +24,6 @@ public interface OnlineShoppingCommodityMapper {
     int deductStockWithCommodityId(long commodityId);
 
     int revertStockWithCommodityId(long commodityId);
+
+    List<OnlineShoppingCommodity> searchCommodityByKeyWord(String keyWord);
 }

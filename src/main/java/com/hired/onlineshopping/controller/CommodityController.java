@@ -2,6 +2,8 @@ package com.hired.onlineshopping.controller;
 
 import com.hired.onlineshopping.db.dao.OnlineShoppingCommodityDao;
 import com.hired.onlineshopping.db.po.OnlineShoppingCommodity;
+import com.hired.onlineshopping.service.EsService;
+import com.hired.onlineshopping.service.SearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,12 @@ public class CommodityController {
 
     @Resource
     OnlineShoppingCommodityDao onlineShoppingCommodityDao;
+
+    @Resource
+    SearchService searchService;
+
+    @Resource
+    EsService esService;
 
     @GetMapping("/addItem")
     public String createCommodityPage() {
@@ -42,8 +50,18 @@ public class CommodityController {
                 .totalStock(availableStock)
                 .build();
         onlineShoppingCommodityDao.insertCommodity(commodity);
+        esService.addCommodityToEs(commodity);
         resultMap.put("Item", commodity);
         return "add_commodity_success";
+    }
+
+    @GetMapping("searchAction")
+    public String search(@RequestParam("keyWord") String keyWord,
+                         Map<String, Object> resultMap) {
+        //List<OnlineShoppingCommodity> onlineShoppingCommodities = searchService.searchCommodityMYSQL(keyWord);
+        List<OnlineShoppingCommodity> onlineShoppingCommodities = searchService.searchCommodityEs(keyWord);
+        resultMap.put("itemList", onlineShoppingCommodities);
+        return "search_items";
     }
 
     @GetMapping({"/commodities", "/"})

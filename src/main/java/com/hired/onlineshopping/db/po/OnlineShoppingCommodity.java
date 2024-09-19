@@ -1,5 +1,6 @@
 package com.hired.onlineshopping.db.po;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.Getter;
 @Getter
 @Data
 @Builder
+@AllArgsConstructor
 public class OnlineShoppingCommodity {
     private Long commodityId;
 
